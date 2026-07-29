@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Prediction</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script>
+        function checkMarried() {
+            let married = document.getElementById("married").value;
+            let incomeField = document.getElementById("incomeField");
+
+            if (married == "0") {
+                incomeField.value = 0;
+                incomeField.style.display = "none";
+            } else {
+                incomeField.style.display = "block";
+            }
+        }
+
+        window.onload = checkMarried;
+    </script>
+</head>
+
+<body>
+
+<div class="login">
+
+    <h1>Simulation de votre crédit</h1>
+
+    <form action="{{ url_for('predict') }}" method="post">
+
+        <!-- Credit History -->
+        <label>Credit History</label>
+        <select name="Credit_History" required>
+            <option value="1">Oui (Bon historique)</option>
+            <option value="0">Non (Mauvais historique)</option>
+        </select>
+
+        <!-- Married -->
+        <label>Êtes-vous marié(e) ?</label>
+        <select id="married" name="Married" onchange="checkMarried()" required>
+            <option value="1">Oui</option>
+            <option value="0">Non</option>
+        </select>
+
+        <!-- Coapplicant Income -->
+        <label>Coapplicant Income</label>
+        <input id="incomeField"
+               type="number"
+               name="CoapplicantIncome"
+               placeholder="Revenu du co-emprunteur"
+               min="0"
+               required />
+
+        <button type="submit" class="btn btn-primary btn-block btn-large">
+            Predict
+        </button>
+
+    </form>
+
+    <br><br>
+
+    {{ prediction_text }}
+
+</div>
+
+</body>
+</html>
