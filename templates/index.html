@@ -1,71 +1,120 @@
 <!DOCTYPE html>
-<html>
 
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Credit Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation de crédit</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+```
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+```
 
-    <script>
-        function checkMarried() {
-            let married = document.getElementById("married").value;
-            let incomeField = document.getElementById("incomeField");
-
-            if (married == "0") {
-                incomeField.value = 0;
-                incomeField.style.display = "none";
-            } else {
-                incomeField.style.display = "block";
-            }
-        }
-
-        window.onload = checkMarried;
-    </script>
 </head>
 
 <body>
 
-<div class="login">
+<div class="container">
+
+```
+<div class="card">
 
     <h1>Simulation de votre crédit</h1>
+    <p class="description">
+        Remplissez les informations ci-dessous pour obtenir une estimation.
+    </p>
 
     <form action="{{ url_for('predict') }}" method="post">
 
-        <!-- Credit History -->
-        <label>Credit History</label>
-        <select name="Credit_History" required>
-            <option value="1">Oui (Bon historique)</option>
-            <option value="0">Non (Mauvais historique)</option>
-        </select>
+        <div class="form-group">
+            <label for="credit_history">Historique de crédit</label>
 
-        <!-- Married -->
-        <label>Êtes-vous marié(e) ?</label>
-        <select id="married" name="Married" onchange="checkMarried()" required>
-            <option value="1">Oui</option>
-            <option value="0">Non</option>
-        </select>
+            <select id="credit_history" name="Credit_History" required>
+                <option value="1">Oui — Bon historique</option>
+                <option value="0">Non — Mauvais historique</option>
+            </select>
+        </div>
 
-        <!-- Coapplicant Income -->
-        <label>Coapplicant Income</label>
-        <input id="incomeField"
-               type="number"
-               name="CoapplicantIncome"
-               placeholder="Revenu du co-emprunteur"
-               min="0"
-               required />
+        <div class="form-group">
+            <label for="married">Êtes-vous marié(e) ?</label>
 
-        <button type="submit" class="btn btn-primary btn-block btn-large">
-            Predict
+            <select id="married"
+                    name="Married"
+                    onchange="checkMarried()"
+                    required>
+                <option value="1">Oui</option>
+                <option value="0">Non</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="incomeGroup">
+            <label for="incomeField">Revenu du co-emprunteur</label>
+
+            <input id="incomeField"
+                   type="number"
+                   name="CoapplicantIncome"
+                   placeholder="Exemple : 2000"
+                   min="0"
+                   required>
+        </div>
+
+        <button type="submit">
+            Vérifier mon crédit
         </button>
 
     </form>
 
-    <br><br>
+    {% if prediction_text %}
+        <div class="result
+            {% if prediction_status == 'accepted' %}
+                accepted
+            {% else %}
+                rejected
+            {% endif %}
+        ">
+            <span class="result-icon">
+                {% if prediction_status == 'accepted' %}
+                    ✓
+                {% else %}
+                    ✕
+                {% endif %}
+            </span>
 
-    {{ prediction_text }}
+            <div>
+                <h2>{{ prediction_text }}</h2>
+
+                {% if prediction_status == 'accepted' %}
+                    <p>Votre demande de crédit est susceptible d'être acceptée.</p>
+                {% else %}
+                    <p>Votre demande de crédit est susceptible d'être refusée.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
 
 </div>
+```
+
+</div>
+
+<script>
+    function checkMarried() {
+        const married = document.getElementById("married").value;
+        const incomeField = document.getElementById("incomeField");
+        const incomeGroup = document.getElementById("incomeGroup");
+
+        if (married === "0") {
+            incomeField.value = 0;
+            incomeField.style.display = "none";
+            incomeGroup.style.display = "none";
+        } else {
+            incomeField.style.display = "block";
+            incomeGroup.style.display = "block";
+        }
+    }
+
+    window.onload = checkMarried;
+</script>
 
 </body>
 </html>
