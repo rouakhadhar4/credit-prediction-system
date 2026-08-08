@@ -1,37 +1,49 @@
+import os
+import pickle
 import numpy as np
 from flask import Flask, request, jsonify, render_template
-import pickle
 
-app = Flask(__name__)
-model = pickle.load(open('model.pkl', 'rb'))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-@app.route('/')
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
+
+model = pickle.load(
+    open(os.path.join(BASE_DIR, "model.pkl"), "rb")
+)
+
+
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/predict',methods=['POST'])
+
+@app.route("/predict", methods=["POST"])
 def predict():
-    '''
-    For rendering results on HTML GUI
-    '''
     int_features = [int(x) for x in request.form.values()]
     final_features = [np.array(int_features)]
     prediction = model.predict(final_features)
 
     output = round(prediction[0], 2)
 
-    return render_template('index.html', prediction_text='la réponse de la requéte  {}'.format(output))
+    return render_template(
+        "index.html",
+        prediction_text=f"La réponse de la requête : {output}"
+    )
 
-@app.route('/predict_api',methods=['POST'])
+
+@app.route("/predict_api", methods=["POST"])
 def predict_api():
-    '''
-    For direct API calls trought request
-    '''
     data = request.get_json(force=True)
     prediction = model.predict([np.array(list(data.values()))])
 
     output = prediction[0]
+
     return jsonify(output)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
